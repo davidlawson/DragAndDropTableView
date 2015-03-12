@@ -39,7 +39,9 @@ const static CGFloat kAutoScrollingThreshold = 60;
 @end
 
 
+@interface DragAndDropTableView () <UIGestureRecognizerDelegate>
 
+@end
 
 @implementation DragAndDropTableView
 
@@ -77,8 +79,18 @@ const static CGFloat kAutoScrollingThreshold = 60;
 {
     // register gesture recognizer
     _dndLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(onLongPressGestureRecognizerTap:)];
+    _dndLongPressGestureRecognizer.delegate = self;
     [self addGestureRecognizer:_dndLongPressGestureRecognizer];
-    
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return touch.view.class != [UIButton class];
 }
 
 #pragma mark Actions
