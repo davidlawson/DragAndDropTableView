@@ -250,24 +250,27 @@ const static CGFloat kAutoScrollingThreshold = 60;
             [((NSObject<DragAndDropTableViewDelegate> *)self.delegate) tableView:self didEndDraggingCellToIndexPath:_movingIndexPath placeHolderView:_cellSnapShotImageView];
 #pragma clang diagnostic pop
         
-        // remove image
-        BOOL respondsToAnimateDraggedCells = [self.dataSource respondsToSelector:@selector(tableViewShouldAnimateDraggedCells:)];
-        if(!respondsToAnimateDraggedCells ||
-           (respondsToAnimateDraggedCells && [((NSObject<DragAndDropTableViewDataSource> *)self.dataSource) tableViewShouldAnimateDraggedCells:self]))
+        if (_cellSnapShotImageView)
         {
-            [UIView animateWithDuration:.3 animations:^{
-                NSIndexPath *ipx = [self indexPathForCell:cell];
-                if(ipx)
-                    _cellSnapShotImageView.frame = [self rectForRowAtIndexPath:ipx];
-            } completion:^(BOOL finished) {
+            // remove image
+            BOOL respondsToAnimateDraggedCells = [self.dataSource respondsToSelector:@selector(tableViewShouldAnimateDraggedCells:)];
+            if(!respondsToAnimateDraggedCells ||
+               (respondsToAnimateDraggedCells && [((NSObject<DragAndDropTableViewDataSource> *)self.dataSource) tableViewShouldAnimateDraggedCells:self]))
+            {
+                [UIView animateWithDuration:.3 animations:^{
+                    NSIndexPath *ipx = [self indexPathForCell:cell];
+                    if(ipx)
+                        _cellSnapShotImageView.frame = [self rectForRowAtIndexPath:ipx];
+                } completion:^(BOOL finished) {
+                    [_cellSnapShotImageView removeFromSuperview]; _cellSnapShotImageView = nil;
+                    [self reloadData];
+                }];
+            }
+            else
+            {
                 [_cellSnapShotImageView removeFromSuperview]; _cellSnapShotImageView = nil;
                 [self reloadData];
-            }];
-        }
-        else
-        {
-            [_cellSnapShotImageView removeFromSuperview]; _cellSnapShotImageView = nil;
-            [self reloadData];
+            }
         }
       
         _proxyDataSource.movingIndexPath = nil;
